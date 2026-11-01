@@ -12,7 +12,6 @@ export default function App() {
 
   // UI state untuk navigasi dan modal
   const [activeNav, setActiveNav] = useState("dashboard");
-  const [activeTab, setActiveTab] = useState("projects");
   const [filter, setFilter] = useState("all"); // 'all' | 'in-progress' | 'completed'
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -51,11 +50,7 @@ export default function App() {
 
       {/* 2. Area Kerja Utama (Zone B) */}
       <main className="flex-1 bg-[#F9FAFC] flex flex-col p-6 sm:p-8 min-w-0">
-        <HeaderWorkspace
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          onOpenModal={() => setIsModalOpen(true)}
-        />
+        <HeaderWorkspace onOpenModal={() => setIsModalOpen(true)} />
 
         <div className="flex-1 mt-6">
           <TaskList

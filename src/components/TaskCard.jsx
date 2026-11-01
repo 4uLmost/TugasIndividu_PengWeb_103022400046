@@ -12,7 +12,7 @@ export default function TaskCard({
     <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between group relative">
       <div>
         {/* Card Header: Title & Status Badge */}
-        <div className="flex items-start justify-between gap-2 mb-2.5">
+        <div className="flex items-start justify-between gap-2 mb-2">
           <h3
             className={`font-bold text-sm sm:text-base capitalize line-clamp-1 transition cursor-pointer ${
               task.completed
@@ -43,12 +43,37 @@ export default function TaskCard({
           </button>
         </div>
 
-        {/* Card Metadata / Sub-bullets */}
-        <div className="text-xs text-slate-500 space-y-1 mb-4">
-          <p className="flex items-center gap-1.5 text-slate-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-            <span>Task ID #{task.id}</span>
+        {/* Card Description (jika ada) */}
+        {task.description && (
+          <p className="text-xs text-slate-600 line-clamp-2 mb-3 leading-relaxed">
+            {task.description}
           </p>
+        )}
+
+        {/* Card Subtasks (jika ada) */}
+        {task.subtasks && task.subtasks.length > 0 && (
+          <div className="mb-3 space-y-1">
+            <p className="text-[11px] font-semibold text-slate-500">
+              Subtask ({task.subtasks.length}):
+            </p>
+            <div className="space-y-1 max-h-20 overflow-y-auto pr-1">
+              {task.subtasks.slice(0, 3).map((st) => (
+                <div key={st.id} className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  <span className="truncate">{st.text}</span>
+                </div>
+              ))}
+              {task.subtasks.length > 3 && (
+                <p className="text-[10px] text-slate-400 pl-3">
+                  +{task.subtasks.length - 3} subtask lainnya...
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Card Metadata: Kategori (tanpa Task ID) */}
+        <div className="text-xs text-slate-500 mb-4">
           <p className="text-slate-400 text-[11px] truncate flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
             <span>Kategori: <strong className="text-slate-600 font-semibold">{task.category || "General"}</strong></span>

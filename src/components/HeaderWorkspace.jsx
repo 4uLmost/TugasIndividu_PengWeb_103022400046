@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 
-export default function HeaderWorkspace({
-  activeTab = "projects",
-  onTabChange,
-  onOpenModal,
-}) {
+export default function HeaderWorkspace({ onOpenModal }) {
   // State lokal agar bisa mengetik tanpa mengaktifkan fitur pencarian
   const [searchValue, setSearchValue] = useState("");
 
@@ -12,17 +8,9 @@ export default function HeaderWorkspace({
     <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
       {/* Tab Navigation */}
       <div className="flex items-center gap-6">
-        <button
-          type="button"
-          onClick={() => onTabChange && onTabChange("projects")}
-          className={`text-xl sm:text-2xl font-bold tracking-tight transition ${
-            activeTab === "projects"
-              ? "text-slate-900 border-b-2 border-slate-900 pb-0.5"
-              : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 select-none">
           Projects
-        </button>
+        </h1>
       </div>
 
       {/* Action Controls & CTA Button */}
