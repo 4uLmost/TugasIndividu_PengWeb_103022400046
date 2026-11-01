@@ -8,6 +8,7 @@ export default function TaskFormModal({ isOpen, onClose, onAddTask }) {
   const [completed, setCompleted] = useState(false);
   const [subtasks, setSubtasks] = useState([]);
   const [subtaskInput, setSubtaskInput] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   if (!isOpen) return null;
@@ -28,32 +29,42 @@ export default function TaskFormModal({ isOpen, onClose, onAddTask }) {
     setSubtasks((prev) => prev.filter((s) => s.id !== id));
   };
 
-  const handleSubmit = (e) => {
+  // Submit form dengan async POST handling
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!title.trim()) {
-      setErrorMsg("Judul tugas wajib diisi!");
+      setErrorMsg("Judul catatan wajib diisi!");
       return;
     }
 
-    // oxlint-disable-next-line react/purity
-    const newId = Date.now();
-    const newTask = {
-      id: newId,
-      title: title.trim(),
-      description: description.trim(),
-      subtasks: [...subtasks],
-      category,
-      completed,
-      createdAt: "Baru saja",
-      starred: false,
-    };
+    setIsSubmitting(true);
+    setErrorMsg("");
 
-    onAddTask(newTask);
+    try {
+      // oxlint-disable-next-line react/purity
+      const newId = Date.now();
+      const newTask = {
+        id: newId,
+        title: title.trim(),
+        description: description.trim(),
+        subtasks: [...subtasks],
+        category,
+        completed,
+        createdAt: "Baru saja",
+        starred: false,
+      };
 
-    // Reset state & close
-    resetForm();
-    onClose();
+      await onAddTask(newTask);
+
+      // Reset state & close
+      resetForm();
+      onClose();
+    } catch (err) {
+      setErrorMsg(err.message || "Gagal menyimpan catatan.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -63,6 +74,7 @@ export default function TaskFormModal({ isOpen, onClose, onAddTask }) {
     setCompleted(false);
     setSubtasks([]);
     setSubtaskInput("");
+    setIsSubmitting(false);
     setErrorMsg("");
   };
 
@@ -166,7 +178,7 @@ export default function TaskFormModal({ isOpen, onClose, onAddTask }) {
               <button
                 type="button"
                 onClick={handleAddSubtask}
-                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition"
+                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer"
               >
                 + Tambah
               </button>
@@ -184,7 +196,7 @@ export default function TaskFormModal({ isOpen, onClose, onAddTask }) {
                     <button
                       type="button"
                       onClick={() => handleRemoveSubtask(st.id)}
-                      className="text-slate-400 hover:text-rose-500 ml-2 font-bold"
+                      className="text-slate-400 hover:text-rose-500 ml-2 font-bold cursor-pointer"
                       title="Hapus Subtask"
                     >
                       ✕
@@ -232,15 +244,24 @@ export default function TaskFormModal({ isOpen, onClose, onAddTask }) {
             <button
               type="button"
               onClick={handleClose}
+              disabled={isSubmitting}
               className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-bold text-white bg-[#1EBBA6] hover:bg-[#189e8c] active:scale-95 rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+              disabled={isSubmitting}
+              className="px-5 py-2 text-xs font-bold text-white bg-[#1EBBA6] hover:bg-[#189e8c] active:scale-95 disabled:opacity-60 rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
             >
-              <span>+ Simpan Catatan</span>
+              {isSubmitting ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Menyimpan (POST)...</span>
+                </>
+              ) : (
+                <span>+ Simpan Catatan</span>
+              )}
             </button>
           </div>
         </form>

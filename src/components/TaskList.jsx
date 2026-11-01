@@ -3,6 +3,9 @@ import TaskCard from "./TaskCard";
 
 export default function TaskList({
   tasks = [],
+  isLoading = false,
+  errorMessage = null,
+  onRetry,
   filter = "all",
   onFilterChange,
   onToggleComplete,
@@ -11,7 +14,7 @@ export default function TaskList({
 }) {
   const [viewMode, setViewMode] = useState("grid"); // 'grid' | 'list'
 
-  // Filter tasks based on status
+  // Filter tasks berdasarkan status selesai / belum
   const filteredTasks = tasks.filter((task) => {
     if (filter === "completed") return task.completed;
     if (filter === "in-progress") return !task.completed;
@@ -78,8 +81,72 @@ export default function TaskList({
         </div>
       </div>
 
-      {/* CONDITIONAL RENDERING: KONDISI DAFTAR KOSONG */}
-      {tasks.length === 0 && (
+      {/* 1. KONDISI LOADING: Skeleton Loader Cards */}
+      {isLoading && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between text-xs text-slate-400 animate-pulse pb-1">
+            <span>Sedang memuat data dari REST API JSONPlaceholder...</span>
+            <span className="font-semibold text-teal-600">Loading AJAX...</span>
+          </div>
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
+                : "flex flex-col space-y-3"
+            }
+          >
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <div
+                key={n}
+                className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm animate-pulse space-y-4"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="h-4 bg-slate-200 rounded w-2/3"></div>
+                  <div className="h-5 bg-slate-100 rounded-full w-16"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 bg-slate-100 rounded w-full"></div>
+                  <div className="h-3 bg-slate-100 rounded w-4/5"></div>
+                </div>
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <div className="h-3 bg-slate-200 rounded w-20"></div>
+                  <div className="h-4 bg-slate-100 rounded w-10"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 2. KONDISI ERROR: Alert Box Merah + Tombol "Coba Lagi" */}
+      {!isLoading && errorMessage && (
+        <div className="bg-rose-50 border border-rose-200/90 rounded-2xl p-8 text-center max-w-md mx-auto my-12 space-y-4 shadow-sm animate-in fade-in duration-200">
+          <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+            !
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-rose-900">Gagal Mengambil Data</h3>
+            <p className="text-xs text-rose-700 mt-1 leading-relaxed">{errorMessage}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onRetry}
+            className="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeWidth="2"
+                strokeLinecap="round"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            <span>Coba Lagi</span>
+          </button>
+        </div>
+      )}
+
+      {/* 3. KONDISI SUCCESS: Render Daftar Tugas atau Empty State */}
+      {!isLoading && !errorMessage && tasks.length === 0 && (
         <div className="text-center py-16 px-4 bg-white rounded-2xl border border-dashed border-slate-300 shadow-sm space-y-2">
           <p className="text-base font-bold text-slate-700">
             Belum ada data Tugas. Silakan tambahkan tugas baru melalui tombol di atas.
@@ -91,7 +158,7 @@ export default function TaskList({
       )}
 
       {/* Filter menghasilkan 0 item (tetapi ada data total) */}
-      {tasks.length > 0 && filteredTasks.length === 0 && (
+      {!isLoading && !errorMessage && tasks.length > 0 && filteredTasks.length === 0 && (
         <div className="text-center py-14 bg-white rounded-2xl border border-dashed border-slate-200">
           <p className="text-sm font-semibold text-slate-600">
             Tidak ada tugas pada kategori filter "{filter}".
@@ -107,7 +174,7 @@ export default function TaskList({
       )}
 
       {/* RENDER LIST DENGAN .map() */}
-      {filteredTasks.length > 0 && (
+      {!isLoading && !errorMessage && filteredTasks.length > 0 && (
         <div
           className={
             viewMode === "grid"
