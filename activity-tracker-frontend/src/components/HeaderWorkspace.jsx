@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function HeaderWorkspace({ onOpenModal }) {
+export default function HeaderWorkspace({ onOpenModal, title = "Projects" }) {
   // State lokal agar bisa mengetik tanpa mengaktifkan fitur pencarian
   const [searchValue, setSearchValue] = useState("");
 
@@ -9,7 +9,7 @@ export default function HeaderWorkspace({ onOpenModal }) {
       {/* Tab Navigation */}
       <div className="flex items-center gap-6">
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 select-none">
-          Projects
+          {title}
         </h1>
       </div>
 

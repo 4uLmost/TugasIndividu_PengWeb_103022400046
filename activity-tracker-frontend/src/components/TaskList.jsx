@@ -11,6 +11,7 @@ export default function TaskList({
   onToggleComplete,
   onDeleteTask,
   onToggleStar,
+  onEdit,
 }) {
   const [viewMode, setViewMode] = useState("grid"); // 'grid' | 'list'
 
@@ -189,6 +190,7 @@ export default function TaskList({
               onToggleComplete={onToggleComplete}
               onDeleteTask={onDeleteTask}
               onToggleStar={onToggleStar}
+              onEdit={onEdit}
             />
           ))}
         </div>

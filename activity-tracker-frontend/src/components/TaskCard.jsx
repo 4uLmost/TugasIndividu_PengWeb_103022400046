@@ -5,8 +5,21 @@ export default function TaskCard({
   onToggleComplete,
   onDeleteTask,
   onToggleStar,
+  onEdit,
 }) {
   const [showMenu, setShowMenu] = useState(false);
+
+  const formattedDate = (() => {
+    if (!task.createdAt) return "Baru saja";
+    const parsed = new Date(task.createdAt);
+    if (isNaN(parsed.getTime())) return task.createdAt;
+    return parsed.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  })();
 
   return (
     <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between group relative">
@@ -85,7 +98,7 @@ export default function TaskCard({
       <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
         <div className="flex items-center gap-1.5">
           <span className="text-[11px] text-slate-500 font-medium">
-            {task.createdAt || "Baru saja"}
+            {formattedDate}
           </span>
         </div>
 
@@ -129,6 +142,16 @@ export default function TaskCard({
                 className="absolute right-0 bottom-full mb-1 w-36 bg-white border border-slate-100 rounded-xl shadow-lg py-1 z-20 animate-in fade-in zoom-in-95 duration-100"
                 onMouseLeave={() => setShowMenu(false)}
               >
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onEdit) onEdit(task);
+                    setShowMenu(false);
+                  }}
+                  className="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 transition"
+                >
+                  Edit Catatan
+                </button>
                 <button
                   type="button"
                   onClick={() => {
